@@ -10,7 +10,7 @@ const postCitation = '&DestLinkType=CitingArticles&DestApp=WOS_CPL';
 const preDoi='https://doi.org/';
 var eissnq1List = eissnq2List = eissnq3List = eissnq4List = eissnahList = []; 
 var issnq1List = issnq2List = issnq3List = issnq4List = issnahList = []; 
-let wSID = 'F6dXQ2mQoVRjQcPTElb';
+let wSID = '';
 var countLimit=0;  // 0=> there is no limit
 var printQuartile=true;
 var printLinks=true;
