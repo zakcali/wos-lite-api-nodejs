@@ -9,7 +9,7 @@ Read quartile values of journals according to their issn/essin numbers from a li
 AHCI publications don't have quartile values, so marked with AH
 Quartile values changes every year, so don't trust quartile values for articles published outside of 2019-2020 period
 
-there weren't an example for nodejs, but for php, python, and ruby:
+there weren't examples for nodejs, but for php, python, and ruby:
 
 https://gist.github.com/pol/1321660 
 
