@@ -7,7 +7,8 @@ You can chang retrieveDelay value according to throttle messages got from WOS
 I need to prevent callback hell.
 Read quartile values of journals according to their issn/essin numbers from a list created on 2020.
 AHCI publications don't have quartile values, so marked with AH
-Quartile values changes every year, so don't trust quartile values for articles published outside of 2019-2020 period
+
+Quartile values change every year, so don't trust quartile values for articles published outside of 2019-2020 period
 
 there weren't examples for nodejs, but for php, python, and ruby:
 
