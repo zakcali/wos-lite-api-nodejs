@@ -1,5 +1,4 @@
 const soap = require ('soap');
-const util = require('util');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const auth_url = 'http://search.webofknowledge.com/esti/wokmws/ws/WOKMWSAuthenticate?wsdl';
@@ -23,7 +22,8 @@ var pubArray= new Array ([]);
 var arrayLength=0;
 
 //let advText = 'AI=U-7339-2017';
-let advText = 'OG=(Baskent University)'
+//let advText = 'OG=(Baskent University)'
+let advText= 'AD=(harvard univ SAME Med*) '
 let editions = [];
 editions.push({'collection':'WOS', 'edition':'SCI'});
 editions.push({'collection':'WOS', 'edition':'SSCI'});
@@ -61,18 +61,8 @@ let publicationLine='';
 	if (printOrder == true) {
 			publicationLine=(k+1)+'- ' }
 publicationLine = publicationLine
-+pubArray[k][0]
-+pubArray[k][1]+'. '
-+pubArray[k][2]+' '
-+pubArray[k][3]+';'
-+pubArray[k][4]
-+pubArray[k][5]
-+pubArray[k][6]+' '
-+pubArray[k][7]+', '
-+pubArray[k][8]+', ' 
-+pubArray[k][9]+', '
-+' doi='+pubArray[k][10]+', '
-+'Number of authors='+pubArray[k][11]
++pubArray[k][0]+pubArray[k][1]+'. '+pubArray[k][2]+' '+pubArray[k][3]+';'+pubArray[k][4]+pubArray[k][5]+pubArray[k][6]
++' '+pubArray[k][7]+', '+pubArray[k][8]+', '+pubArray[k][9]+', '+' doi='+pubArray[k][10]+', '+'Number of authors='+pubArray[k][11]
 
 if (printQuartile==true) {
 	publicationLine=publicationLine+', '+pubArray[k][12];}
@@ -340,8 +330,6 @@ var j=i = 0;
 	pubArray[firstArray-1+i][15]=wosCitationLink;
 	pubArray[firstArray-1+i][16]=issn;
 	pubArray[firstArray-1+i][17]=eissn;
-	   
-
 	}
 
 			} // end of handleHundred			
