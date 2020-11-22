@@ -10,12 +10,15 @@ AHCI publications don't have quartile values, so marked with AH
 
 Quartile values change every year, so don't trust quartile values for articles published outside of 2019-2020 period
 
-there weren't examples for nodejs, but for php, python, and ruby:
+There weren't examples for nodejs, but for php, python, and ruby:
 
 https://gist.github.com/pol/1321660 
 
 https://gist.github.com/domoritz/2012629
 
-after getting SID value, note it, and then paste as: let wSID = 'xxxaaabbbtttuuuqyyy';
+To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 13th line as: let wSID = 'xxxaaabbbtttuuuqyyy';
+
+You can use same SID value for hours
+
 
 
