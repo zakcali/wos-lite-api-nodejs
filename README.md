@@ -16,7 +16,9 @@ https://gist.github.com/pol/1321660
 
 https://gist.github.com/domoritz/2012629
 
-To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 13th line as: let wSID = 'xxxaaabbbtttuuuqyyy';
+To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 13th line as: 
+
+let wSID = 'xxxaaabbbtttuuuqyyy';
 
 You can use same SID value for hours
 
