@@ -16,4 +16,6 @@ https://gist.github.com/pol/1321660
 
 https://gist.github.com/domoritz/2012629
 
+after getting SID value, note it, and then paste as: let wSID = 'xxxaaabbbtttuuuqyyy';
+
 
