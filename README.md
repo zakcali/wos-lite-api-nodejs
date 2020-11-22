@@ -3,7 +3,7 @@ Web of Science soap API access with nodejs (javascript)
 
 Proof of concept: get Web of Science articles; page by page with SOAP api, from: http://search.webofknowledge.com/esti/wokmws/ws/WokSearchLite?wsdl, 
 find Quartiles of articles, and print them.
-It was difficult then php, because nodejs is async. You need to handle asyncronus dat got feom WOS, process pages un-sequentially, wait for all pages to be retrieved, than print.
+It was difficult then php, because nodejs is async. You need to handle asyncronus dat got feom WOS, process pages un-sequentially, wait for all pages to be retrieved, then print.
 You can change retrieveDelay value according to throttle messages got from WOS
 I need to prevent callback hell. I'm new to nodejs. You could fork and produce better code than me by using async/await.
 Reads quartile values of journals according to their issn/essin numbers from a list created on 2020.
