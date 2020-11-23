@@ -1,5 +1,4 @@
 const soap = require ('soap');
-const fetch = require('node-fetch');
 const fs = require('fs');
 const auth_url = 'http://search.webofknowledge.com/esti/wokmws/ws/WOKMWSAuthenticate?wsdl';
 const search_url = 'http://search.webofknowledge.com/esti/wokmws/ws/WokSearchLite?wsdl';
@@ -16,7 +15,6 @@ var printQuartile=true;
 var printLinks=true;
 var printOrder=true;
 var printToScreen=true;
-var firstWOS=''; // prevent same hundred to be retrieved again
 const retrieveDelay=800; //call retrieve function every .... ms between 800-2000 enough
 var pubArray= new Array ([]);
 var arrayLength=0;
@@ -175,22 +173,20 @@ retrieveArticles (result.return, search_client)
 
 }
 function retrieveArticles (firstResult, s_client) {
-	articleOrder=0;
-	n=firstResult.recordsFound;
-	arrayLength=n;
+	arrayLength=firstResult.recordsFound;
 	currentWindow=0;
-	windowCount= ( (n/100) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
-	for (kk=0; kk<n; kk++) {
+	windowCount= ( (arrayLength/100) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
+	for (kk=0; kk<arrayLength; kk++) {
 		pubArray.push([0]); // create empty elements on publication array
 	}
 	queryId = firstResult.queryId;
 	console.log ('sessionID =', wSID, ',queryID =', queryId) 
-	console.log ('Between '+timespanBegin, ' and ', timespanEnd, ', number of articles indexed in Web of Science Q1,Q2,Q3,Q4/AHCI are:', n)
-	if (n===0) {
+	console.log ('Between '+timespanBegin, ' and ', timespanEnd, ', number of articles indexed in Web of Science Q1,Q2,Q3,Q4/AHCI are:', arrayLength)
+	if (arrayLength===0) {
 		return
 	}
-	retCount = n;
-	if (countLimit > 0 && countLimit < n) { // for faster debugging
+	retCount = arrayLength;
+	if (countLimit > 0 && countLimit < arrayLength) { // for faster debugging
 		retCount=countLimit; } 			// limit number of articles retrieved
 	retBase = 1; //first record to be retrieved
 	recNumber=0; // record number to be printed on the beginnig of lines
@@ -235,27 +231,29 @@ if (pageSize<0) {return;}
 function handleHundred (articles, firstArray) {
 var j=i = 0;
 	for (i=0; i<articles.records.length; i++) {
-		++articleOrder;
 
 		let authors = title=journal=year=pubdate=issue=volume=pages=articleNo=doi=doiLink=issn=eissn=quartile=docType=docSubtype='';
 		let wos= articles.records[i].uid;
 		let wosLink = preArticle+wos+postArticle
 		let wosCitationLink= preCitation+wos+postCitation
-		if (articles.records[i].title[0].value[0]) {title= articles.records[i].title[0].value[0];}
+
 		let authorArray=articles.records[i].authors[0].value.slice(0) // replicate authors
 		let nAuthors=authorArray.length;
+
 		for (j=0; j<articles.records[i].authors[0].value.length; j++) {
 			authors = authors+authorArray[j]
 			 if (j==nAuthors-1) { // this is the last author
 				 if (authors.endsWith('.')) {
 					 authors=authors+' '; }
 				 else {authors=authors+'. '; } // print . after last author
-	
 			 }
 			 else  {
 				 authors=authors+';'; // print ; after each author
 			 }
 			}
+		let titleObj= articles.records[i].title.find (tt =>tt.label==='Title');
+		if (titleObj) {title=titleObj.value[0];}
+		
 		let journalObj= articles.records[i].source.find (j =>j.label==='SourceTitle');
 		if (journalObj) {journal=journalObj.value[0];}
 
@@ -330,6 +328,8 @@ var j=i = 0;
 	pubArray[firstArray-1+i][15]=wosCitationLink;
 	pubArray[firstArray-1+i][16]=issn;
 	pubArray[firstArray-1+i][17]=eissn;
+	pubArray[firstArray-1+i][18]=docType;
+	pubArray[firstArray-1+i][19]=docSubtype;
 	}
 
 			} // end of handleHundred			
