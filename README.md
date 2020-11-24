@@ -38,4 +38,4 @@ I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
     pubArray.pop();
 }
 ```
-  I suggest you to empty pubArray [], before retrieving for a new Query as suggested above code
+  I suggest you to empty pubArray [], before retrieving for second and subsequent queries with above code
