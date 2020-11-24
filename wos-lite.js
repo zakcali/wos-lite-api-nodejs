@@ -104,7 +104,6 @@ iah = () => {fs.readFile ('issnahci.txt', 'utf8', (err,data) => {
 
 
 async function getSid (){
-
 if (wSID === '') { 	// get SID if already not obtained
 	const client = await soap.createClientAsync(auth_url);
 	const response = await client.authenticateAsync({});
@@ -114,7 +113,6 @@ if (wSID === '') { 	// get SID if already not obtained
 }
 
 async function retrieveArticles() {
-
 	const search_client = await soap.createClientAsync(search_url);
 	search_client.addHttpHeader('Cookie', 'SID=' + wSID)
 	const result = await search_client.searchAsync(search_object);
@@ -280,7 +278,6 @@ var j=i = 0;
 } // end of retrieveArticles ()
 
 function printToConsole () {
-
 for (k=0; k<arrayLength; k++) {
 let publicationLine='';
 	if (printOrder == true) {
@@ -298,7 +295,6 @@ publicationLine = publicationLine
 +pubArray[k][9]+', '
 +' doi='+pubArray[k][10]+', '
 +'Number of authors='+pubArray[k][11]
-
 if (printQuartile==true) {
 	publicationLine=publicationLine+', '+pubArray[k][12];}
 if (printLinks==true) {
@@ -307,8 +303,8 @@ if (printToScreen==true){
 	console.log (publicationLine); }
 	}
 }
-
+// main program
 getqList()
 .then(result1 => {return getSid();})
 .then(result2 => {return retrieveArticles();})
-.then(result3 => {printToConsole ();})	
+.then(result3 => {printToConsole ();})	// you have all articles in pubArray, do whatever you want here
