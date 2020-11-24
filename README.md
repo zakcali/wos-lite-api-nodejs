@@ -17,7 +17,7 @@ https://gist.github.com/pol/1321660
 
 https://gist.github.com/domoritz/2012629
 
-To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 13th line as: 
+To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 12nd line as: 
 
 let wSID = 'xxxaaabbbtttuuuqyyy';
 
@@ -26,6 +26,7 @@ You can use same SID value for hours
 It was hard for me to learn async/await codes, I couldn't believe the code works without using setTimeout command !!
 
 I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
+
   getqList()
   .then(result1 => {return getSid();})
   .then(result2 => {return retrieveArticles();})
