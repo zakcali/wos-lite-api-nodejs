@@ -33,3 +33,9 @@ I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
  .then(result3 => {printToConsole ();})	
 ```
   you could do whatever you want with pubArray[] instead of {printToConsole ();} above code
+ ``` 
+  while(pubArray.length > 0) {
+    pubArray.pop();
+}
+```
+  I suggest you to empty pubArray [], before retrieving for a new Query as suggested above code
