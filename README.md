@@ -17,7 +17,7 @@ https://gist.github.com/pol/1321660
 
 https://gist.github.com/domoritz/2012629
 
-https://github.com/zakcali/WosAdvSearch/blob/master/wos-retrieve.php (my php code retrieves all of the articles page by page)
+https://github.com/zakcali/WosAdvSearch/blob/master/wos-retrieve.php (my fully working php code retrieves all of the articles page by page, and prints them)
 
 To prevent throttle messages during debugging, after getting SID value, note it, and then paste to 12nd line as: 
 
