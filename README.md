@@ -32,7 +32,7 @@ I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
  .then(result2 => {return retrieveArticles();})
  .then(result3 => {printToConsole ();})	
 ```
-  you could do whatever you want with pubArray[] instead of {printToConsole ();} above code
+  you could do whatever you want with pubArray[] in place of {printToConsole ();} above code
  ``` 
   while(pubArray.length > 0) {
     pubArray.pop();
