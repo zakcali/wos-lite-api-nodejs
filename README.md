@@ -26,10 +26,11 @@ You can use same SID value for hours
 It was hard for me to learn async/await codes, I couldn't believe the code works without using setTimeout command !!
 
 I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
-  getqList()
-  .then(result1 => {return getSid();})
-  .then(result2 => {return retrieveArticles();})
-  .then(result3 => {printToConsole ();})	
+```
+ getqList()
+ .then(result1 => {return getSid();})
+ .then(result2 => {return retrieveArticles();})
+ .then(result3 => {printToConsole ();})	
   
   you could do whatever you want with pubArray instead of "printToConsole ();" above code
-
+```
