@@ -23,7 +23,7 @@ let wSID = 'xxxaaabbbtttuuuqyyy';
 
 You can use same SID value for hours
 
-It was hard for me to learn async/await codes, I couldn't believe the code works without using setTimeout command !!
+It was hard for me to learn async/await codes, I couldn't believe the code works without using setTimeout command !! I don't use retrieveDelay variable anymore.
 
 I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html
 ```
