@@ -18,6 +18,7 @@ var printToScreen=true;
 const retrieveDelay=800; //call retrieve function every .... ms between 800-2000 enough
 var pubArray= new Array ([]);
 var arrayLength=0;
+readCompleted = false;
 
 //let advText = 'AI=U-7339-2017';
 //let advText = 'OG=(Baskent University)'
@@ -50,33 +51,12 @@ let search_object = {
 	'retrieveParameters': retrieveParameters
 }
 
-getqListRetrieve();
-
-function printToConsole () {
-
-for (k=0; k<arrayLength; k++) {
-let publicationLine='';
-	if (printOrder == true) {
-			publicationLine=(k+1)+'- ' }
-publicationLine = publicationLine
-+pubArray[k][0]+pubArray[k][1]+'. '+pubArray[k][2]+' '+pubArray[k][3]+';'+pubArray[k][4]+pubArray[k][5]+pubArray[k][6]
-+' '+pubArray[k][7]+', '+pubArray[k][8]+', '+pubArray[k][9]+', '+' doi='+pubArray[k][10]+', '+'Number of authors='+pubArray[k][11]
-
-if (printQuartile==true) {
-	publicationLine=publicationLine+', '+pubArray[k][12];}
-if (printLinks==true) {
-	publicationLine=publicationLine+', '+pubArray[k][13]+', '+pubArray[k][14]+', '+pubArray[k][15];}
-if (printToScreen==true){
-	console.log (publicationLine); }
-	}
-}
-
-function getqListRetrieve () {
+async function getqList (){
 if ((!eissnq1List.length)) {
 	eq1();
 	} // start callback ladder to be able to finish reading all Q files befor WOS search
 else {
-	retrieve();
+	return ('read all articles')
 	} // call the function because all text files already}
 function eq1 () {fs.readFile ('eissnq1.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
@@ -118,68 +98,34 @@ iq4 = () => {fs.readFile ('issnq4.txt', 'utf8', (err,data) => {
 iah = () => {fs.readFile ('issnahci.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
 	issnahList = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
-	retrieve() }) } // all quartile files are red, free to call retrieve()
+	 }) } // all quartile files are red, free to call retrieve()
+	return ('read all articles')
 } // end of function getqList ()
 
 
-function retrieve () {
+async function getSid (){
 
-getSidReadFirstPrintAll()
-
-
-function getSidReadFirstPrintAll (){
 if (wSID === '') { 	// get SID if already not obtained
-	soap.createClient(auth_url, (err,auth_client) => {
-		if (err) {
-			console.log ('cannot connect to Web of Science');
-			return;
-				}
-getSID (auth_client)		
-		})
+	const client = await soap.createClientAsync(auth_url);
+	const response = await client.authenticateAsync({});
+	wSID = response[0].return  //strange, with sync function use: response.return
 	}
-else readFirst();	
+	return;
 }
 
-function getSID (a_Client) {
-a_Client.authenticate ((err, result) => {
-	if (err) {
-		console.log ('authenticate error:', err.message)
-		if (err.message.includes('No matches returned for IP')) {
-			console.log ('sorry, yor ip is not authenticated')
-			}
-		return;
-		}
-wSID=result.return;
-readFirst();
-	})
-}
+async function retrieveArticles() {
 
-function readFirst() {
-
-soap.createClient(search_url, function (err,search_client) {
-	if (err) {
-		console.log ('createClient error:', err.message);
-		return;
-		}
-search_client.addHttpHeader('Cookie', 'SID=' + wSID)
-search_client.search(search_object , (err, result) =>{
-	if (err) {
-		console.log ('search error:', err.message);
-		return;
-		}
-retrieveArticles (result.return, search_client)
-		})
-	}) 
-
-}
-function retrieveArticles (firstResult, s_client) {
-	arrayLength=firstResult.recordsFound;
+	const search_client = await soap.createClientAsync(search_url);
+	search_client.addHttpHeader('Cookie', 'SID=' + wSID)
+	const result = await search_client.searchAsync(search_object);
+		
+	arrayLength=result[0].return.recordsFound;
 	currentWindow=0;
 	windowCount= ( (arrayLength/100) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
 	for (kk=0; kk<arrayLength; kk++) {
 		pubArray.push([0]); // create empty elements on publication array
 	}
-	queryId = firstResult.queryId;
+	queryId = result[0].return.queryId;
 	console.log ('sessionID =', wSID, ',queryID =', queryId) 
 	console.log ('Between '+timespanBegin, ' and ', timespanEnd, ', number of articles indexed in Web of Science Q1,Q2,Q3,Q4/AHCI are:', arrayLength)
 	if (arrayLength===0) {
@@ -190,10 +136,16 @@ function retrieveArticles (firstResult, s_client) {
 		retCount=countLimit; } 			// limit number of articles retrieved
 	retBase = 1; //first record to be retrieved
 	recNumber=0; // record number to be printed on the beginnig of lines
-	timer=setInterval (retrieveHundred,retrieveDelay); // call every ...... ms, to prevent  Web of Science giving throttle error 
+	readCompleted=false;
+	for (r=0; r<windowCount; r++) {
+		await retrieveHundred ();
+	}
+	console.log ('all async accomplished');
+	return 'all async accomplished';
 
-function retrieveHundred () {
-if (retCount < 0) {return;}
+
+async function retrieveHundred () {
+//if (retCount < 0) {return;}
 if (retCount <100)
 	{pageSize = retCount;}
 	else pageSize = 100;
@@ -206,27 +158,19 @@ let retrieve_object = {
 		}]
 }
 console.log ('number of articles to be retrieved=', pageSize, ' starting with',retBase)
+
+	const rresult = await search_client.retrieveAsync(retrieve_object);
+	currentWindow++;
+	console.log (rresult[0].return.records[0].uid, retBase, 'current Window:', currentWindow) // WOS of first article
+//	console.log(rresult[0].return);
+	console.log('start', retBase)
+	handleHundred (rresult[0].return, retBase); 
+//	printToConsole();
 retBase=retBase+100;
 retCount=retCount-100;
-clientRetrieve(retBase-100, pageSize)
+return 'page received and processed'
 
-function clientRetrieve (start, size) {
-if (pageSize<0) {return;} 
-	s_client.retrieve(retrieve_object , (err, result) => {
-	if (err) {
-		console.log ("couldn't retrieve 100", err.message);
-		return;
-		}
-	else {
-		currentWindow++;
-	console.log (result.return.records[0].uid, start, 'current Window:', currentWindow) // WOS of first article
-	handleHundred (result.return, start, size); }
-	if (retCount < 0) {
-		clearInterval (timer);
-		if (currentWindow==windowCount) {printToConsole();} // all pages retrieved and handled asynchronously
-		}
-	
-}) }
+} //end of retrieveHundred ()
 
 function handleHundred (articles, firstArray) {
 var j=i = 0;
@@ -332,9 +276,39 @@ var j=i = 0;
 	pubArray[firstArray-1+i][19]=docSubtype;
 	}
 
-			} // end of handleHundred			
-		} //end of retrieveHundred ()
-	} // end of retrieveArticles ()
-} // end of retrieve ()
+			} // end of handleHundred ()		
+} // end of retrieveArticles ()
 
+function printToConsole () {
 
+for (k=0; k<arrayLength; k++) {
+let publicationLine='';
+	if (printOrder == true) {
+			publicationLine=(k+1)+'- ' }
+publicationLine = publicationLine
++pubArray[k][0]
++pubArray[k][1]+'. '
++pubArray[k][2]+' '
++pubArray[k][3]+';'
++pubArray[k][4]
++pubArray[k][5]
++pubArray[k][6]+' '
++pubArray[k][7]+', '
++pubArray[k][8]+', '
++pubArray[k][9]+', '
++' doi='+pubArray[k][10]+', '
++'Number of authors='+pubArray[k][11]
+
+if (printQuartile==true) {
+	publicationLine=publicationLine+', '+pubArray[k][12];}
+if (printLinks==true) {
+	publicationLine=publicationLine+', '+pubArray[k][13]+', '+pubArray[k][14]+', '+pubArray[k][15];}
+if (printToScreen==true){
+	console.log (publicationLine); }
+	}
+}
+
+getqList()
+.then(result1 => {return getSid();})
+.then(result2 => {return retrieveArticles();})
+.then(result3 => {printToConsole ();})	
