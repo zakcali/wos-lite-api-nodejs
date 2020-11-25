@@ -9,47 +9,42 @@ const postCitation = '&DestLinkType=CitingArticles&DestApp=WOS_CPL';
 const preDoi='https://doi.org/';
 var eissnq1List = eissnq2List = eissnq3List = eissnq4List = eissnahList = []; 
 var issnq1List = issnq2List = issnq3List = issnq4List = issnahList = []; 
-let wSID = '';
+let wSID = 'D3keuwsmMOccK7JOKxu';
 var countLimit=0;  // 0=> there is no limit
 var printQuartile=true;
 var printLinks=true;
 var printOrder=true;
 var printToScreen=true;
-const retrieveDelay=800; //call retrieve function every .... ms between 800-2000 enough
-var pubArray= new Array ([]);
+var pubArray= [];
 var arrayLength=0;
-readCompleted = false;
 
 //let advText = 'AI=U-7339-2017';
 //let advText = 'OG=(Baskent University)'
 let advText= 'AD=(harvard univ SAME Med*) '
-let editions = [];
-editions.push({'collection':'WOS', 'edition':'SCI'});
-editions.push({'collection':'WOS', 'edition':'SSCI'});
-editions.push({'collection':'WOS', 'edition':'AHCI'});
-//editions.push({'collection':'WOS', 'edition':'ISTP'});
-//editions.push({'collection':'WOS', 'edition':'ISSHP'});
-//editions.push({'collection':'WOS', 'edition':'IC'});
-//editions.push({'collection':'WOS', 'edition':'CCR'});
-//editions.push({'collection':'WOS', 'edition':'BSCI'});
-//editions.push({'collection':'WOS', 'edition':'BHCI'});
 let sortField = 'PY'; // AU= author, PY=Publication year, TC=Times cited, SO=Source, CW=Source, LD=Load date
 let sortOrder = 'D'; // A=ascending, D=descending
 let timespanBegin='2020-01-01';
 let timespanEnd='2030-12-31';
-let timeSpan = [{'begin': timespanBegin, 'end':timespanEnd}];
 
-let retrieveParameters = [ {'count':'2', 'firstRecord':'1'}];
+var editions = [];
+// flags for including/excluding WOS editions
+let fSCI=true; //Science Citation Index Expanded
+let fSSCI=true; //Social Sciences Citation Index
+let fAHCI=true; //Arts & Humanities Citation Index
+let fISTP=false; //Conference Proceedings Citation Index - Science
+let fISSHP=false; //Conference Proceedings Citation Index - Social Sciences
+let fIC=false;   // *** wos-lite isn't authorized IC edition: Index Chemicus **** //
+let fCCR=false;   // *** wos-lite isn't authorized CCR edition: WOS CCR Current Chemical *** //
+let fBSCI=false; // Book Citation Index - Science
+let fBHCI=false; // Book Citation Index - Social Sciences and Humanities
 
-let search_object = {
-  'queryParameters' : [{
-	'databaseId' : 'WOS',
-    'userQuery' : advText,
-    'editions' : editions,
-	'timeSpan': timeSpan,
-	'queryLanguage': 'en'}],
-	'retrieveParameters': retrieveParameters
-}
+// main program
+getqList()
+.then(result1 => {return getSid();})
+.then(result2 => {return retrieveArticles();})
+.then(result3 => {printToConsole ();})	// you have all articles in pubArray, do whatever you want here
+.catch(error => {console.log (error.message)});
+// end of main program
 
 async function getqList (){
 if ((!eissnq1List.length)) {
@@ -65,59 +60,97 @@ function eq1 () {fs.readFile ('eissnq1.txt', 'utf8', (err,data) => {
 	}) } 
 eq2 = () => {fs.readFile ('eissnq2.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	eissnq2List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	eissnq2List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	eq3() }) }
 eq3 = () => {fs.readFile ('eissnq3.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	eissnq3List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	eissnq3List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	eq4() }) }
 eq4 = () => {fs.readFile ('eissnq4.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	eissnq4List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	eissnq4List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	eah() }) }
 eah = () => {fs.readFile ('eissnahci.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	eissnahList = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	eissnahList = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	iq1() }) }
 iq1 = () => {fs.readFile ('issnq1.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	issnq1List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	issnq1List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	iq2() }) }
 iq2 = () => {fs.readFile ('issnq2.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	issnq2List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	issnq2List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	iq3() }) }
 iq3 = () => {fs.readFile ('issnq3.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	issnq3List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	issnq3List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	iq4() }) }
 iq4 = () => {fs.readFile ('issnq4.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	issnq4List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	issnq4List = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	iah() }) }
 iah = () => {fs.readFile ('issnahci.txt', 'utf8', (err,data) => {
 	if(err) {console.log('quartile file reading error'); return; }
-	issnahList = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); // remove BOM. Remove '\r', because on windows, newline = '\r\n'
+	issnahList = data.toString().replace(/[^\x00-\x7F]/g,'').replace(/\r/g, '').split("\n"); 
 	 }) } // all quartile files are red, free to call retrieve()
-	return ('read all articles')
+	return ('read all quartile files')
 } // end of function getqList ()
-
 
 async function getSid (){
 if (wSID === '') { 	// get SID if already not obtained
 	const client = await soap.createClientAsync(auth_url);
 	const response = await client.authenticateAsync({});
-	wSID = response[0].return  //strange, with sync function use: response.return
+	wSID = response[0].return  //use response.return for authenticate(), use response[0].return for authenticateAsync()
 	}
-	return;
+	return 'got SID';
 }
 
 async function retrieveArticles() {
+
+while(pubArray.length > 0) { // empty publication array before second and subsequent searches
+   pubArray.pop();
+}
+while(editions.length > 0) { // empty edition array before second and subsequent searches
+   editions.pop();
+}
+
+let retrieveParameters = [ {'count':'1', 'firstRecord':'1'}];
+let timeSpan = [{'begin': timespanBegin, 'end':timespanEnd}];
+
+if (fSCI) // flag for inncluding SCI edition
+	{editions.push({'collection':'WOS', 'edition':'SCI'});}
+if (fSSCI)
+	{editions.push({'collection':'WOS', 'edition':'SSCI'});}
+if (fAHCI)
+	{editions.push({'collection':'WOS', 'edition':'AHCI'});}
+if (fISTP)
+	{editions.push({'collection':'WOS', 'edition':'ISTP'});}
+if (fISSHP)
+	{editions.push({'collection':'WOS', 'edition':'ISSHP'});}
+if (fIC)
+	{editions.push({'collection':'WOS', 'edition':'IC'});}
+if (fCCR)
+	{editions.push({'collection':'WOS', 'edition':'CCR'});}
+if (fBSCI)
+	{editions.push({'collection':'WOS', 'edition':'BSCI'});}
+if (fBHCI)
+	{editions.push({'collection':'WOS', 'edition':'BHCI'});}
+
+let search_object = {
+  'queryParameters' : [{
+	'databaseId' : 'WOS',
+    'userQuery' : advText,
+    'editions' : editions,
+	'timeSpan': timeSpan,
+	'queryLanguage': 'en'}],
+	'retrieveParameters': retrieveParameters
+}
 	const search_client = await soap.createClientAsync(search_url);
 	search_client.addHttpHeader('Cookie', 'SID=' + wSID)
 	const result = await search_client.searchAsync(search_object);
 		
-	arrayLength=result[0].return.recordsFound;
+	arrayLength=result[0].return.recordsFound; //use result.return for search(), use result[0].return for searchAsync()
 	currentWindow=0;
 	windowCount= ( (arrayLength/100) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
 	for (kk=0; kk<arrayLength; kk++) {
@@ -125,7 +158,7 @@ async function retrieveArticles() {
 	}
 	queryId = result[0].return.queryId;
 	console.log ('sessionID =', wSID, ',queryID =', queryId) 
-	console.log ('Between '+timespanBegin, ' and ', timespanEnd, ', number of articles indexed in Web of Science Q1,Q2,Q3,Q4/AHCI are:', arrayLength)
+	console.log ('Between '+timespanBegin, ' and ', timespanEnd, ', number of articles indexed in Web of Science Collections you searched for are:', arrayLength)
 	if (arrayLength===0) {
 		return
 	}
@@ -134,16 +167,13 @@ async function retrieveArticles() {
 		retCount=countLimit; } 			// limit number of articles retrieved
 	retBase = 1; //first record to be retrieved
 	recNumber=0; // record number to be printed on the beginnig of lines
-	readCompleted=false;
 	for (r=0; r<windowCount; r++) {
 		await retrieveHundred ();
 	}
 	console.log ('all async accomplished');
 	return 'all async accomplished';
 
-
 async function retrieveHundred () {
-//if (retCount < 0) {return;}
 if (retCount <100)
 	{pageSize = retCount;}
 	else pageSize = 100;
@@ -156,18 +186,15 @@ let retrieve_object = {
 		}]
 }
 console.log ('number of articles to be retrieved=', pageSize, ' starting with',retBase)
-
-	const rresult = await search_client.retrieveAsync(retrieve_object);
+	const rresult = await search_client.retrieveAsync(retrieve_object); 	//use rresult.return for retrieve(), use rresult[0].return for retrieveAsync()
 	currentWindow++;
-	console.log (rresult[0].return.records[0].uid, retBase, 'current Window:', currentWindow) // WOS of first article
-//	console.log(rresult[0].return);
+	//use rresult.return for retrieve(), use rresult[0].return for retrieveAsync()
+	console.log (rresult[0].return.records[0].uid, retBase, 'current Window:', currentWindow) 	// WOS of first article
 	console.log('start', retBase)
 	handleHundred (rresult[0].return, retBase); 
-//	printToConsole();
 retBase=retBase+100;
 retCount=retCount-100;
-return 'page received and processed'
-
+return 'page received and processed';
 } //end of retrieveHundred ()
 
 function handleHundred (articles, firstArray) {
@@ -293,18 +320,17 @@ publicationLine = publicationLine
 +pubArray[k][7]+', '
 +pubArray[k][8]+', '
 +pubArray[k][9]+', '
-+' doi='+pubArray[k][10]+', '
-+'Number of authors='+pubArray[k][11]
++'Number of authors='+pubArray[k][11]+', '
+if (pubArray[k][10] !=='')
+	{ publicationLine=publicationLine+' doi='+pubArray[k][10]+', ';}
 if (printQuartile==true) {
-	publicationLine=publicationLine+', '+pubArray[k][12];}
-if (printLinks==true) {
-	publicationLine=publicationLine+', '+pubArray[k][13]+', '+pubArray[k][14]+', '+pubArray[k][15];}
+	publicationLine=publicationLine+pubArray[k][12]+', ';}
+if (printLinks==true && pubArray[k][10] !=='') {
+	publicationLine=publicationLine+pubArray[k][13]+', '
+}
+if (printLinks==true) { 
+	publicationLine=publicationLine+pubArray[k][14]+', '+pubArray[k][15];}
 if (printToScreen==true){
 	console.log (publicationLine); }
 	}
 }
-// main program
-getqList()
-.then(result1 => {return getSid();})
-.then(result2 => {return retrieveArticles();})
-.then(result3 => {printToConsole ();})	// you have all articles in pubArray, do whatever you want here
