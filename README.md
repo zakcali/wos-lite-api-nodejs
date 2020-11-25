@@ -33,11 +33,16 @@ I suggest you to read 25.9.2 on https://exploringjs.com/es6/ch_promises.html#sec
  .then(result1 => {return getSid();})
  .then(result2 => {return retrieveArticles();})
  .then(result3 => {printToConsole ();})	
+ .catch(error => {console.log (error.message)});
 ```
   you could do whatever you want with pubArray[] in place of {printToConsole ();} above code
  ``` 
-  while(pubArray.length > 0) {
-    pubArray.pop();
+while(pubArray.length > 0) { // empty publication array before second and subsequent searches
+   pubArray.pop();
+}
+while(editions.length > 0) { // empty edition array before second and subsequent searches
+   editions.pop();
+}
 }
 ```
-  I suggest you to empty pubArray [], before retrieving for second and subsequent queries with above code
+  I suggest you to empty pubArray [] and editions [], before retrieving for second and subsequent queries with above code
