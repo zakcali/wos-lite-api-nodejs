@@ -9,7 +9,7 @@ const postCitation = '&DestLinkType=CitingArticles&DestApp=WOS_CPL';
 const preDoi='https://doi.org/';
 var eissnq1List = eissnq2List = eissnq3List = eissnq4List = eissnahList = []; 
 var issnq1List = issnq2List = issnq3List = issnq4List = issnahList = []; 
-let wSID = 'D3keuwsmMOccK7JOKxu';
+let wSID = '';
 var countLimit=0;  // 0=> there is no limit
 var printQuartile=true;
 var printLinks=true;
@@ -19,8 +19,8 @@ var pubArray= [];
 var arrayLength=0;
 
 //let advText = 'AI=U-7339-2017';
-//let advText = 'OG=(Baskent University)'
-let advText= 'AD=(harvard univ SAME Med*) '
+let advText = 'OG=(Baskent University)'
+//let advText= 'AD=(harvard univ SAME Med*) '
 let sortField = 'PY'; // AU= author, PY=Publication year, TC=Times cited, SO=Source, CW=Source, LD=Load date
 let sortOrder = 'D'; // A=ascending, D=descending
 let timespanBegin='2020-01-01';
@@ -152,7 +152,7 @@ let search_object = {
 		
 	arrayLength=result[0].return.recordsFound; //use result.return for search(), use result[0].return for searchAsync()
 	currentWindow=0;
-	windowCount= ( (arrayLength/100) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
+	windowCount= (((arrayLength/100)-1) | 0)+1 // convert to integer, then compare if currentWindow = windowCount, then print array
 	for (kk=0; kk<arrayLength; kk++) {
 		pubArray.push([0]); // create empty elements on publication array
 	}
