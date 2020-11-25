@@ -43,6 +43,5 @@ while(pubArray.length > 0) { // empty publication array before second and subseq
 while(editions.length > 0) { // empty edition array before second and subsequent searches
    editions.pop();
 }
-}
 ```
   I suggest you to empty pubArray [] and editions [], before retrieving for second and subsequent queries with above code
